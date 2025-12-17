@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation';
 import { shopData } from '@/lib/shopData';
 import Image from 'next/image';
-import { Star, ArrowLeft } from 'lucide-react';
+import { Star, ArrowLeft, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
+import { ProductCard } from '@/app/components/ProductCard';
 
 interface FacilityPageProps {
   params: {
@@ -30,9 +31,76 @@ async function getFacilityData(id: string | undefined) {
   return product;
 }
 
+// function ProductCard({ product }: { product: any }) {
+//   return (
+//     <div className="group relative">
+//       <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
+//         <Image
+//           src={product.image}
+//           alt={product.name}
+//           width={300}
+//           height={400}
+//           className="h-full w-full object-cover object-center lg:h-full lg:w-full"
+//         />
+//       </div>
+//       <div className="mt-4 flex justify-between">
+//         <div>
+//           <h3 className="text-sm text-gray-700">
+//             <Link href={`/facility/${product.id}`}>
+//               <span aria-hidden="true" className="absolute inset-0" />
+//               {product.name}
+//             </Link>
+//           </h3>
+//           <p className="mt-1 text-sm text-gray-500">{product.category}</p>
+//         </div>
+//         <p className="text-sm font-medium text-gray-900">${product.price.toFixed(2)}</p>
+//       </div>
+//     </div>
+//   );
+// }
+
 export default async function FacilityPage({ params }: FacilityPageProps) {
   const getParams = await params;
-  const facility = await getFacilityData(getParams.id);
+  const id = getParams.id.toLowerCase();
+  
+  // Check if the ID is a category (men, women, kids)
+  // const isCategory = ['men', 'women', 'kids'].includes(id);
+  
+  // if (isCategory) {
+  //   // Show category products
+  //   const categoryProducts = shopData[id as keyof typeof shopData] || [];
+    
+  //   return (
+  //     <div className="container mx-auto px-4 py-8">
+  //       {/* <div className="mb-6 pt-5">
+  //         <Button asChild variant="ghost" className="gap-2 cursor-pointer px-0! hover:bg-transparent!">
+  //           <Link href="/">
+  //             <ArrowLeft size={16} />
+  //             Back
+  //           </Link>
+  //         </Button>
+  //       </div> */}
+  //         {/* <h1 className="text-3xl font-bold mt-4 capitalize">{id}</h1> */}
+
+  //       {categoryProducts.length > 0 ? (
+  //         <div className="grid py-12 grid-cols-1 gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-4">
+  //           {categoryProducts.map((product) => (
+  //             <ProductCard key={product.id} product={product} />
+  //           ))}
+  //         </div>
+  //       ) : (
+  //         <div className="text-center py-12">
+  //           <ShoppingBag className="mx-auto h-12 w-12 text-gray-400" />
+  //           <h3 className="mt-2 text-sm font-medium text-gray-900">No products found</h3>
+  //           <p className="mt-1 text-sm text-gray-500">There are no products in this category yet.</p>
+  //         </div>
+  //       )}
+  //     </div>
+  //   );
+  // }
+
+  // Existing product detail view
+  const facility = await getFacilityData(id);
 
   if (!facility) {
     notFound();
@@ -50,7 +118,6 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
       </div>
       
       <div className="grid md:grid-cols-2 gap-8 pb-5">
-        {/* Facility Image */}
         <div className="overflow-hidden">
           <Image
             src={facility.image}
@@ -62,7 +129,6 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
           />
         </div>
 
-        {/* Facility Details */}
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold">{facility.name}</h1>

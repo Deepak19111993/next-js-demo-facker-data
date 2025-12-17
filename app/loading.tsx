@@ -14,7 +14,7 @@ export default function Loading() {
       <div className="text-xl font-semibold mb-4">
         <Skeleton className='h-6 w-48' />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {[...Array(8)].map((_, i) => (
           <FacilitySkeletonCard key={i} />
         ))}

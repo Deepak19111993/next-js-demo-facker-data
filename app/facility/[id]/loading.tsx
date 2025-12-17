@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export default function Loading() {
   return (
-    <div className="container py-8 animate-pulse">
+    <div className="container py-8! animate-pulse">
       <Skeleton className="h-8 w-24 bg-gray-200 rounded mb-6" />
       
       <div className="grid md:grid-cols-2 gap-8">

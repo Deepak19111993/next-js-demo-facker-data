@@ -1,5 +1,4 @@
 import FacilityListing from "./components/home/FacilityListing";
-// import { generateShopData } from '@/lib/shopData';
 import { shopData } from '@/lib/shopData';
 
 export const dynamic= 'force-dynamic';
@@ -19,6 +18,7 @@ export default async function Page({
         initialData={shopData} 
         initialCategory={category}
         searchParams={parsedSearchParams}
+        categoryFilters={true} 
       />
     </div>
   );

@@ -40,7 +40,7 @@ export default function FacilityCard({
                 </div>
                 <div className="flex flex-col pt-5 pb-0 px-4 space-y-3 relative">
                     {tags && tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
+                        <div className="flex flex-wrap gap-1 pr-14">
                             {tags.map((tag) => (
                                 <span key={tag} className="text-xs font-medium bg-gray-100 px-2 py-0.5 rounded">
                                     {tag}
@@ -48,15 +48,15 @@ export default function FacilityCard({
                             ))}
                         </div>
                     )}
-                    <h3 className="text-base font-semibold w-full pr-14 break-word">{name}</h3>
+                    <h3 className="text-base font-semibold w-full break-word leading-[130%]">{name}</h3>
                     <div className="text-base w-fit"><strong>$ {price}</strong></div>
-                    <div className="absolute top-5 right-5 text-base w-fit flex items-center">
-                        <Star className="inline mr-2" color="orange" fill="orange" size={16} />
+                    <div className="absolute top-5 right-5 w-fit flex items-center text-sm">
+                        <Star className="inline mr-1 -mt-px" color="orange" fill="orange" size={14} />
                         {rating}
                     </div>
                     
                 </div>
-            </Link>
+            
 
             {/* Additional details that aren't part of the link */}
             <div className="px-4 pb-4 pt-0 space-y-4">
@@ -73,7 +73,7 @@ export default function FacilityCard({
                     </div>
                 )}
 
-                {colors && colors.length > 0 && (
+                {/* {colors && colors.length > 0 && (
                     <div className="flex flex-wrap items-center gap-2">
                         {colors.map((color) => (
                             <span
@@ -84,7 +84,7 @@ export default function FacilityCard({
                             />
                         ))}
                     </div>
-                )}
+                )} */}
 
                 {(ageGroup || material || brand) && (
                     <div className="text-sm text-gray-500 space-y-1">
@@ -95,6 +95,7 @@ export default function FacilityCard({
                 )}
                 
             </div>
+            </Link>
         </div>
     )
 }
