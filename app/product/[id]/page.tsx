@@ -33,6 +33,11 @@ async function getFacilityData(id: string | undefined): Promise<Product | undefi
       supabaseClient = supabase;
     }
 
+    if (!supabaseClient) {
+      console.warn('Supabase client not available');
+      return undefined;
+    }
+
     console.log(`Fetching product ${id} from Supabase...`);
     const { data: product, error } = await supabaseClient
       .from('products')

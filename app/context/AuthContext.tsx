@@ -86,6 +86,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Load Orders from Supabase
     useEffect(() => {
         const fetchOrders = async () => {
+            if (!supabase) {
+                console.warn('Supabase client not available');
+                return;
+            }
+
             let query = supabase.from('order_history').select('*');
 
             if (admin) {
@@ -127,6 +132,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const fetchSavedItems = async () => {
             if (user) {
                 setIsLoadingSavedItems(true);
+                if (!supabase) {
+                    setIsLoadingSavedItems(false);
+                    return;
+                }
                 // Try to load from Supabase for logged in users
                 const { data, error } = await supabase
                     .from('saved_items')
@@ -168,24 +177,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (isAlreadySaved) {
             newSaved.delete(productId);
             // Remove from Supabase
-            try {
-                await supabase
-                    .from('saved_items')
-                    .delete()
-                    .eq('user_id', user.id)
-                    .eq('product_id', productId);
-            } catch (error) {
-                console.error("Error removing saved item:", error);
+            if (supabase) {
+                try {
+                    await supabase
+                        .from('saved_items')
+                        .delete()
+                        .eq('user_id', user.id)
+                        .eq('product_id', productId);
+                } catch (error) {
+                    console.error("Error removing saved item:", error);
+                }
             }
         } else {
             newSaved.add(productId);
             // Add to Supabase
-            try {
-                await supabase
-                    .from('saved_items')
-                    .insert({ user_id: user.id, product_id: productId });
-            } catch (error) {
-                console.error("Error adding saved item:", error);
+            if (supabase) {
+                try {
+                    await supabase
+                        .from('saved_items')
+                        .insert({ user_id: user.id, product_id: productId });
+                } catch (error) {
+                    console.error("Error adding saved item:", error);
+                }
             }
         }
 
@@ -299,6 +312,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         console.log("Placing order with data:", orderData);
 
+        if (!supabase) {
+            throw new Error("Supabase client not available");
+        }
+
         const { data, error } = await supabase
             .from('order_history')
             .insert(orderData)
@@ -348,6 +365,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // 2. Update Supabase
         try {
+            if (!supabase) throw new Error("Supabase client not available");
+
             const { error } = await supabase
                 .from('order_history')
                 .update({ status })
