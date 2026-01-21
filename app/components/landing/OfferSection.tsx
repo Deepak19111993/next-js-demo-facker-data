@@ -25,7 +25,7 @@ export function OfferSection() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button size="lg" variant="secondary" className="rounded-full text-blue-600 font-bold text-base min-h-[50px] px-5! py-3! h-auto" asChild>
+                        <Button size="lg" variant="secondary" className="rounded-full text-blue-600 font-bold text-base min-h-[50px] px-8! py-3! h-auto" asChild>
                             <Link href="/shop">
                                 Shop the Sale <ArrowRight className="ml-2 w-5 h-5" />
                             </Link>
