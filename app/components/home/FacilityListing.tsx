@@ -1,163 +1,67 @@
 
 // import FacilityCard from "../FacilityCard";
-import { type Product, type Gender, type ProductCategory } from '@/lib/shopData';
+import { type Product, type ProductCategory, type Gender, generateConsistentData } from '@/lib/shopData';
 import { CategoryButtons } from './CategoryButtons';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from "@/components/ui/sheet";
-import { ListFilterPlus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { CategoryFilter } from "../filter/CategoryFilter";
-import { SizeFilter } from "../filter/SizeFilter";
-import { ClearFiltersButton } from '../filter/ClearFilterButton';
 import { ClearSearch } from '../filter/ClearSearch';
-import { MaterialFilter } from "../filter/MaterialFilter";
+import { FilterDrawer } from "../filter/FilterDrawer";
+import { ClearFiltersButton } from '../filter/ClearFilterButton';
 import { ProductCard } from "../ProductCard";
 import { ProductSkeletonCard } from "../ProductSkeletonCard";
-import { Suspense } from 'react';
-import FacilityListingWithSuspense from './FacilityListingWithSuspense';
+import { Suspense, use } from 'react';
+import { TransitionProvider } from '@/app/context/TransitionContext';
+import { ProductGridSkeletonWrapper } from './ProductGridSkeletonWrapper';
+import { FacilityListingHeader } from './FacilityListingHeader';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { ProductGrid } from './ProductGrid';
 
 interface FacilityListingProps {
-    initialData: {
-        men: Product[];
-        kids: Product[];
-    };
-    initialCategory: Gender;
-    searchParams?: { [key: string]: string | string[] | undefined };
+    listingPromise: ReturnType<typeof generateConsistentData>;
     categoryFilters?: boolean;
+    suspenseKey?: string;
+    category: Gender;
 }
 
-export default async function FacilityListing({
-    initialData,
-    initialCategory,
-    searchParams,
-    categoryFilters = false
-}: FacilityListingProps) {
-    // Add a 2-second delay to simulate loading
-    // await new Promise(resolve => setTimeout(resolve, 2000));
+async function FacilityListingInner({
+    listingPromise,
+    categoryFilters,
+}: {
+    listingPromise: ReturnType<typeof generateConsistentData>;
+    categoryFilters: boolean;
+}) {
+    const listing = await listingPromise;
 
-    // Parse URL parameters
-    const categoryParam = searchParams?.category || initialCategory;
-    const selectedCategory = (Array.isArray(categoryParam) ? categoryParam[0] : categoryParam) as Gender;
-
-       
-    // Add a 2-second delay to simulate loading
-    // await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Search query
-    const searchQuery = searchParams?.q ? String(searchParams.q).toLowerCase() : '';
-    
-    // State for filters
-    const selectedSizes = typeof searchParams?.sizes === 'string' 
-        ? searchParams.sizes.split(',').filter(Boolean) 
-        : [];
-        
-    const selectedCategories = (() => {
-        const categoriesParam = searchParams?.categories;
-        return (typeof categoriesParam === 'string'
-            ? categoriesParam.split(',').filter(Boolean)
-            : []) as ProductCategory[];
-    })();
-    
-    const selectedMaterials = typeof searchParams?.materials === 'string'
-        ? searchParams.materials.split(',').filter(Boolean)
-        : [];
-
-    // Filter products based on selected filters
-    const filteredProducts = (() => {
-        // Make sure we have valid data
-        if (!initialData || !initialData[selectedCategory]) {
-            return [];
-        }
-
-        let result = [...initialData[selectedCategory]];
-
-        // Apply search filter
-        if (searchQuery) {
-            result = result.filter(product =>
-                product.name.toLowerCase().includes(searchQuery) ||
-                product.description.toLowerCase().includes(searchQuery) ||
-                product.category.toLowerCase().includes(searchQuery)
-            );
-        }
-
-        // Apply size filters
-        if (selectedSizes.length > 0) {
-            result = result.filter(product =>
-                product.sizes?.some(size => selectedSizes.includes(size)) || false
-            );
-        }
-
-        // Filter by category if any categories are selected
-        if (selectedCategories.length > 0) {
-            result = result.filter(product =>
-                selectedCategories.includes(product.category)
-            );
-        }
-
-        // Filter by material if any materials are selected
-        if (selectedMaterials.length > 0) {
-            result = result.filter(product => 
-                product.material && selectedMaterials.includes(product.material)
-            );
-        }
-
-        return result;
-    })();
+    const selectedCategory = listing.selectedCategory as Gender;
+    const selectedSubcategory = listing.selectedSubcategory as string | undefined;
+    const searchQuery = listing.searchQuery;
+    const selectedSizes = listing.selectedSizes;
+    const selectedCategories = listing.selectedCategories as ProductCategory[];
+    const selectedMaterials = listing.selectedMaterials;
+    const selectedTypes = listing.selectedTypes as string[];
+    const filteredProducts = listing.filteredProducts as Product[];
 
     return (
         <div className="container">
-            <div className="flex flex-wrap items-center">
+            <div className="flex flex-wrap items-center mb-5">
                 {categoryFilters && <CategoryButtons selectedCategory={selectedCategory} />}
                 <div className={`ml-auto ${!categoryFilters ? 'mb-[-65px]' : ''}`}>
-                    <Sheet>
-                        <SheetTrigger className="cursor-pointer">
-                            <div className="flex items-center gap-1">
-                                <ListFilterPlus />
-                                {(selectedSizes.length > 0 || selectedCategories.length > 0 || selectedMaterials.length > 0) && (
-                                    <span className="ml-1 text-xs bg-primary text-primary-foreground rounded-full h-4 w-4 flex items-center justify-center">
-                                        {selectedSizes.length + selectedCategories.length + selectedMaterials.length}
-                                    </span>
-                                )}
-                            </div>
-                        </SheetTrigger>
-                        <SheetContent className="overflow-y-auto">
-                            <SheetHeader className="border-b border-gray-200 sticky top-0 bg-background z-10">
-                                <SheetTitle>Filter</SheetTitle>
-                            </SheetHeader>
-                            <div className="px-4 py-2">
-                                <CategoryFilter selectedGender={selectedCategory} selectedCategories={selectedCategories} />
-                                <SizeFilter
-                                    selectedSizes={selectedSizes}
-                                    selectedGender={selectedCategory}
-                                    selectedCategories={selectedCategories}
-                                />
-                                {/* material filters */}
-                                <MaterialFilter
-                                    selectedMaterials={selectedMaterials}
-                                    selectedGender={selectedCategory}
-                                    selectedCategories={selectedCategories}
-                                />
-                            </div>
-                            <SheetFooter className="flex flex-row justify-between flex-wrap border-t border-gray-200 sticky bottom-0 bg-background z-10 py-4">
-                                <ClearFiltersButton
-                                    selectedSizes={selectedSizes}
-                                    selectedCategories={selectedCategories}
-                                    selectedMaterials={selectedMaterials}
-                                    className={`flex-1 pointer-events-auto! ${selectedSizes.length === 0 && selectedCategories.length === 0 && selectedMaterials.length === 0 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
-                                    buttonText={'Clear All'} />
-
-                                <Button className="flex-1 cursor-pointer" asChild>
-                                    <SheetTrigger>Show {filteredProducts.length} items</SheetTrigger>
-                                </Button>
-                            </SheetFooter>
-                        </SheetContent>
-                    </Sheet>
+                    <FilterDrawer
+                        selectedGender={selectedCategory}
+                        selectedSubcategory={selectedSubcategory}
+                        selectedSizes={selectedSizes}
+                        selectedCategories={selectedCategories}
+                        selectedMaterials={selectedMaterials}
+                        selectedTypes={selectedTypes}
+                        filteredCount={filteredProducts.length}
+                    />
                 </div>
             </div>
 
-            <h2 className={`text-xl font-semibold my-4 ${!categoryFilters ? 'mb-6' : ''}`}>
-                {selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}'s Collection
-                <span className="text-gray-500 ml-2">({filteredProducts.length} items)</span>
-            </h2>
+            <FacilityListingHeader
+                title={`${selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}'s Collection`}
+                count={filteredProducts.length}
+                categoryFilters={categoryFilters}
+            />
 
             <div className="flex-1">
                 {searchQuery && (
@@ -168,34 +72,64 @@ export default async function FacilityListing({
                         <ClearSearch />
                     </div>
                 )}
-                {/* <Suspense fallback={
+                {filteredProducts.length > 0 ? (
+                    <ProductGridSkeletonWrapper>
+                        <Suspense fallback={null}>
+                            <ProductGrid products={filteredProducts} />
+                        </Suspense>
+                    </ProductGridSkeletonWrapper>
+                ) : (
+                    <div className="text-center py-12">
+                        <p className="text-lg text-gray-600 mb-4">No products found matching your search.</p>
+                        <ClearFiltersButton
+                            selectedSizes={selectedSizes}
+                            selectedCategories={selectedCategories}
+                            selectedMaterials={selectedMaterials}
+                            showOnlyWithActiveFilters={true}
+                            className='cursor-pointer'
+                            buttonText={'Clear Filters'} />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+export default function FacilityListing({
+    listingPromise,
+    categoryFilters = false,
+    suspenseKey,
+    category
+}: FacilityListingProps) {
+    return (
+        <TransitionProvider>
+            <Suspense fallback={
+                <div className='container'>
+                    <div className="flex flex-wrap items-center">
+                        {categoryFilters && <CategoryButtons selectedCategory={category} />}
+                        <div className={`ml-auto ${!categoryFilters ? 'mb-[-65px]' : ''}`}>
+                            <Button className="cursor-not-allowed opacity-50 flex items-center gap-2">
+                                <span className="text-sm font-medium">Filter</span>
+                            </Button>
+                        </div>
+                    </div>
+
+                    <FacilityListingHeader
+                        title={`${category.charAt(0).toUpperCase() + category.slice(1)}'s Collection`}
+                        count={0}
+                        categoryFilters={categoryFilters}
+                        isLoading={true}
+                    />
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {[...Array(8)].map((_, i) => (
                             <ProductSkeletonCard key={i} />
                         ))}
                     </div>
-                }>
-                    {filteredProducts.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {filteredProducts?.map((product: Product) => (
-                                <ProductCard key={product.id} product={product} />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-12">
-                            <p className="text-lg text-gray-600 mb-4">No products found matching your search.</p>
-                            <ClearFiltersButton
-                                selectedSizes={selectedSizes}
-                                selectedCategories={selectedCategories}
-                                selectedMaterials={selectedMaterials}
-                                showOnlyWithActiveFilters={true}
-                                className='cursor-pointer'
-                                buttonText={'Clear Filters'} />
-                        </div>
-                    )}
-                </Suspense> */}
-                <FacilityListingWithSuspense filteredProducts={filteredProducts} selectedSizes={selectedSizes} selectedCategories={selectedCategories} selectedMaterials={selectedMaterials} />
-            </div>
-        </div>
+                </div>
+            }>
+                <FacilityListingInner listingPromise={listingPromise} categoryFilters={categoryFilters} />
+            </Suspense>
+        </TransitionProvider>
     );
 }

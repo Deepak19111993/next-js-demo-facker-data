@@ -1,7 +1,8 @@
 'use client';
 import { Button } from "@/components/ui/button";
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { shopData, type Gender, type ProductCategory } from '@/lib/shopData';
+import { useTransitionContext } from '@/app/context/TransitionContext';
 
 type SizeFilterProps = {
     selectedSizes: string[];
@@ -20,7 +21,7 @@ const getAvailableSizes = (gender: Gender, selectedCategories: ProductCategory[]
         if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
             return;
         }
-        
+
         // Add all available sizes for matching products
         if (product.sizes) {
             product.sizes.forEach(size => sizes.add(size));
@@ -35,38 +36,40 @@ const getAvailableSizes = (gender: Gender, selectedCategories: ProductCategory[]
 };
 
 export function SizeFilter({ selectedSizes = [], selectedGender, selectedCategories = [], onSizesChange }: SizeFilterProps) {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
+    const { isPending, startTransition, router } = useTransitionContext();
 
     const handleSizeToggle = (size: string) => {
         const sizes = new Set(selectedSizes);
-        
+
         if (sizes.has(size)) {
             sizes.delete(size);
         } else {
             sizes.add(size);
         }
-        
+
         const newSizes = Array.from(sizes);
-        
+
         // Update URL
-        const params = new URLSearchParams(searchParams);
+        const params = new URLSearchParams(searchParams.toString());
         if (newSizes.length > 0) {
             params.set('sizes', newSizes.join(','));
         } else {
             params.delete('sizes');
         }
         params.delete('page'); // Reset to first page when changing filters
-        
-        router.push(`${pathname}?${params.toString()}`);
-        
+
+        startTransition(() => {
+            router.push(`${pathname}?${params.toString()}`);
+        });
+
         // Notify parent component if callback provided
         if (onSizesChange) {
             onSizesChange(newSizes);
         }
     };
-    
+
     // Get available sizes based on selected gender and categories
     const availableSizes = getAvailableSizes(selectedGender, selectedCategories);
 
@@ -82,6 +85,7 @@ export function SizeFilter({ selectedSizes = [], selectedGender, selectedCategor
                             variant={selectedSizes.includes(size) ? 'default' : 'outline'}
                             className="cursor-pointer"
                             size="sm"
+                            disabled={isPending}
                             onClick={() => handleSizeToggle(size)}
                         >
                             {size}

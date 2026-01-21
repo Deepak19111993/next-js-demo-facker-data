@@ -1,7 +1,8 @@
 'use client';
 import { Button } from "@/components/ui/button";
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { type Gender, type ProductCategory, shopData } from '@/lib/shopData';
+import { useTransitionContext } from '@/app/context/TransitionContext';
 
 // Get unique categories from shop data based on gender
 const getCategoriesByGender = (gender: Gender): ProductCategory[] => {
@@ -22,9 +23,9 @@ type CategoryFilterProps = {
 };
 
 export function CategoryFilter({ selectedGender, selectedCategories, onCategoryChange }: CategoryFilterProps) {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
+    const { isPending, startTransition, router } = useTransitionContext();
 
     // Get currently selected categories from URL
 
@@ -40,15 +41,30 @@ export function CategoryFilter({ selectedGender, selectedCategories, onCategoryC
         const newCategories = Array.from(categories);
 
         // Update URL
-        const params = new URLSearchParams(searchParams);
+        const params = new URLSearchParams(searchParams.toString());
         if (newCategories.length > 0) {
             params.set('categories', newCategories.join(','));
         } else {
             params.delete('categories');
         }
+
+        params.delete('type');
+        params.delete('types');
+        params.delete('material');
+        params.delete('materials');
+
+        if (selectedGender !== 'kids') {
+            if (newCategories.length === 1) {
+                params.set('subcategory', newCategories[0]);
+            } else {
+                params.delete('subcategory');
+            }
+        }
         params.delete('page'); // Reset to first page when changing filters
 
-        router.push(`${pathname}?${params.toString()}`);
+        startTransition(() => {
+            router.push(`${pathname}?${params.toString()}`);
+        });
 
         // Notify parent component if callback provided
         if (onCategoryChange) {
@@ -75,6 +91,7 @@ export function CategoryFilter({ selectedGender, selectedCategories, onCategoryC
                             variant={selectedCategories.includes(category) ? 'default' : 'outline'}
                             className="cursor-pointer"
                             size="sm"
+                            disabled={isPending}
                             onClick={() => handleCategoryToggle(category)}
                         >
                             {getCategoryLabel(category)}

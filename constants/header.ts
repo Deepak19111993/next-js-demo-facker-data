@@ -20,7 +20,7 @@ export const navLinks: NavItem[] = [
   {
     id: 2,
     name: "Men",
-    href: "",
+    href: "/shop?category=men",
     submenu: [
       {
         title: "Clothing",
@@ -54,7 +54,7 @@ export const navLinks: NavItem[] = [
   {
     id: 3,
     name: "Women",
-    href: "",
+    href: "/shop?category=women",
     submenu: [
       {
         title: "Clothing",
@@ -86,7 +86,7 @@ export const navLinks: NavItem[] = [
   {
     id: 4,
     name: "Kids",
-    href: "",
+    href: "/shop?category=kids",
     submenu: [
       {
         title: "Boys",

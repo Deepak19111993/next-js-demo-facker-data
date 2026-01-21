@@ -1,8 +1,9 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { shopData, type Gender, type ProductCategory } from '@/lib/shopData';
+import { useTransitionContext } from '@/app/context/TransitionContext';
 
 type MaterialFilterProps = {
     selectedMaterials: string[];
@@ -20,7 +21,7 @@ const getAvailableMaterials = (gender: Gender, selectedCategories: ProductCatego
         if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
             return;
         }
-        
+
         // Add material if it exists
         if (product.material) {
             materials.add(product.material);
@@ -31,38 +32,40 @@ const getAvailableMaterials = (gender: Gender, selectedCategories: ProductCatego
     return Array.from(materials).sort();
 };
 
-export function MaterialFilter({ 
-    selectedMaterials = [], 
-    selectedGender, 
-    selectedCategories = [] 
+export function MaterialFilter({
+    selectedMaterials = [],
+    selectedGender,
+    selectedCategories = []
 }: MaterialFilterProps) {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
+    const { isPending, startTransition, router } = useTransitionContext();
 
     const handleMaterialToggle = (material: string) => {
         const materials = new Set(selectedMaterials);
-        
+
         if (materials.has(material)) {
             materials.delete(material);
         } else {
             materials.add(material);
         }
-        
+
         const newMaterials = Array.from(materials);
-        
+
         // Update URL
-        const params = new URLSearchParams(searchParams);
+        const params = new URLSearchParams(searchParams.toString());
         if (newMaterials.length > 0) {
             params.set('materials', newMaterials.join(','));
         } else {
             params.delete('materials');
         }
         params.delete('page'); // Reset to first page when changing filters
-        
-        router.push(`${pathname}?${params.toString()}`);
+
+        startTransition(() => {
+            router.push(`${pathname}?${params.toString()}`);
+        });
     };
-    
+
     // Get available materials based on selected gender and categories
     const availableMaterials = getAvailableMaterials(selectedGender, selectedCategories);
 
@@ -81,6 +84,7 @@ export function MaterialFilter({
                         variant={selectedMaterials.includes(material) ? 'default' : 'outline'}
                         className="cursor-pointer capitalize"
                         size="sm"
+                        disabled={isPending}
                         onClick={() => handleMaterialToggle(material)}
                     >
                         {material}

@@ -1,10 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ProductSkeletonCard } from '../ProductSkeletonCard';
 import { ProductCard } from '../ProductCard';
 import { ClearFiltersButton } from '../filter/ClearFilterButton';
-import { useSearchParams } from 'next/navigation';
 
 export default function FacilityListingWithSuspense({
     filteredProducts,
@@ -17,26 +14,26 @@ export default function FacilityListingWithSuspense({
     selectedCategories: string[];
     selectedMaterials: string[];
 }) {
-    const searchParams = useSearchParams();
-    const [isLoading, setIsLoading] = useState(true);
+    // const searchParams = useSearchParams();
+    // const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        setIsLoading(true);
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 1000);
-        return () => clearTimeout(timer);
-    }, [searchParams?.toString()]); // Re-run when search params change
+    // useEffect(() => {
+    //     setIsLoading(true);
+    //     const timer = setTimeout(() => {
+    //         setIsLoading(false);
+    //     }, 1000);
+    //     return () => clearTimeout(timer);
+    // }, [searchParams?.toString()]); // Re-run when search params change
 
-    if (isLoading) {
-        return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {[...Array(filteredProducts?.length ?? 4)].map((_, i) => (
-                    <ProductSkeletonCard key={i} />
-                ))}
-            </div>
-        );
-    }
+    // if (isLoading) {
+    //     return (
+    //         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    //             {[...Array(filteredProducts?.length ?? 4)].map((_, i) => (
+    //                 <ProductSkeletonCard key={i} />
+    //             ))}
+    //         </div>
+    //     );
+    // }
 
     return (
         filteredProducts.length > 0 ? (

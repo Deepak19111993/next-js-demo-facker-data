@@ -1,25 +1,20 @@
-import FacilityListing from "./components/home/FacilityListing";
-import { shopData } from '@/lib/shopData';
 
-export const dynamic= 'force-dynamic';
+import { HeroSection } from "./components/landing/HeroSection";
+import { TestimonialSection } from "./components/landing/TestimonialSection";
+import { AboutSection } from "./components/landing/AboutSection";
+import { OfferSection } from "./components/landing/OfferSection";
+import { PerfumeParallaxSection } from "./components/landing/PerfumeParallaxSection";
 
-export default async function Page({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}) {
-  // Fetch data on the server
- const parsedSearchParams = await searchParams || {};
-  const category = (parsedSearchParams.category as 'men' | 'kids' | undefined) || 'men';
+export const dynamic = 'force-dynamic';
 
+export default function Page() {
   return (
-    <div className="py-5">
-      <FacilityListing 
-        initialData={shopData} 
-        initialCategory={category}
-        searchParams={parsedSearchParams}
-        categoryFilters={true} 
-      />
+    <div className="flex flex-col min-h-screen">
+      <HeroSection />
+      <AboutSection />
+      <TestimonialSection />
+      <PerfumeParallaxSection />
+      <OfferSection />
     </div>
   );
 }

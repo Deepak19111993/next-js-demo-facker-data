@@ -24,7 +24,7 @@ export default function FacilityCard({
 }: Product) {
     return (
         <div className="border border-[#ececec] rounded-md overflow-hidden hover:shadow-md transition-shadow">
-            <Link href={`/facility/${id}`} className="block">
+            <Link href={`/product/${id}`} className="block">
                 <div className="relative aspect-[1.4/1] w-full">
                     <Image
                         src={image}
@@ -54,26 +54,26 @@ export default function FacilityCard({
                         <Star className="inline mr-1 -mt-px" color="orange" fill="orange" size={14} />
                         {rating}
                     </div>
-                    
+
                 </div>
-            
 
-            {/* Additional details that aren't part of the link */}
-            <div className="px-4 pb-4 pt-0 space-y-4">
-                {sizes && sizes.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                        {sizes.map((size) => (
-                            <span
-                                key={size}
-                                className="rounded-full bg-gray-100 px-2.5 py-0.5 text-sm text-gray-700"
-                            >
-                                {size}
-                            </span>
-                        ))}
-                    </div>
-                )}
 
-                {/* {colors && colors.length > 0 && (
+                {/* Additional details that aren't part of the link */}
+                <div className="px-4 pb-4 pt-0 space-y-4">
+                    {sizes && sizes.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                            {sizes.map((size) => (
+                                <span
+                                    key={size}
+                                    className="rounded-full bg-gray-100 px-2.5 py-0.5 text-sm text-gray-700"
+                                >
+                                    {size}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* {colors && colors.length > 0 && (
                     <div className="flex flex-wrap items-center gap-2">
                         {colors.map((color) => (
                             <span
@@ -86,15 +86,15 @@ export default function FacilityCard({
                     </div>
                 )} */}
 
-                {(ageGroup || material || brand) && (
-                    <div className="text-sm text-gray-500 space-y-1">
-                        {ageGroup && <div>{ageGroup}</div>}
-                        {material && <div>{material}</div>}
-                        {brand && <div>{brand}</div>}
-                    </div>
-                )}
-                
-            </div>
+                    {(ageGroup || material || brand) && (
+                        <div className="text-sm text-gray-500 space-y-1">
+                            {ageGroup && <div>{ageGroup}</div>}
+                            {material && <div>{material}</div>}
+                            {brand && <div>{brand}</div>}
+                        </div>
+                    )}
+
+                </div>
             </Link>
         </div>
     )

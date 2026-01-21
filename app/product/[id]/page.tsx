@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
-import { shopData } from '@/lib/shopData';
+import { shopData, Product } from '@/lib/shopData';
 import Image from 'next/image';
 import { Star, ArrowLeft, ShoppingBag } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
-import { ProductCard } from '@/app/components/ProductCard';
+import { supabase } from '@/lib/supabaseClient';
+import AddToCartButton from '@/app/components/AddToCartButton';
 
 interface FacilityPageProps {
   params: {
@@ -13,21 +14,73 @@ interface FacilityPageProps {
   };
 }
 
-async function getFacilityData(id: string | undefined) {
+async function getFacilityData(id: string | undefined): Promise<Product | undefined> {
   if (!id) return undefined;
-  
-  const allProducts = [...shopData.men, ...shopData.kids];
+
+  // 1. Try fetching from Supabase
+  try {
+    // Check if ID is likely a database ID (numeric) or legacy string
+    // If usage of 'men-0' styles persists, we might need a mapping or just rely on fallback.
+    // For now, let's attempt query. If it fails (e.g. invalid syntax for int column), we catch it.
+
+    // Use dynamic import or just import at top? Import at top is fine as it's server component.
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    let supabaseClient;
+    if (serviceRoleKey) {
+      const { createClient } = await import('@supabase/supabase-js');
+      supabaseClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
+    } else {
+      supabaseClient = supabase;
+    }
+
+    console.log(`Fetching product ${id} from Supabase...`);
+    const { data: product, error } = await supabaseClient
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (product) {
+      return {
+        id: String(product.id),
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        category: product.category,
+        type: product.type,
+        gender: product.gender,
+        image: product.image,
+        rating: product.rating,
+        reviews: product.reviews,
+        inStock: product.inStock,
+        brand: product.brand,
+        material: product.material,
+        createdAt: new Date(product.created_at),
+        tags: product.tags || [],
+        sizes: product.sizes || [],
+        colors: product.colors || [],
+        kidsSubcategory: product.kidsSubcategory,
+        ageGroup: product.ageGroup
+      };
+    }
+  } catch (error) {
+    // Ignore error and fall back to static data (e.g. invalid input syntax for uuid/int)
+    // console.warn("Supabase fetch failed or ID format mismatch:", error);
+  }
+
+  // 2. Fallback to static shopData
+  const allProducts = [...shopData.men, ...shopData.women, ...shopData.kids];
   const idStr = String(id); // Ensure id is a string
-  
+
   // First try exact match
   let product = allProducts.find(p => p.id === idStr);
 
-  
+
   // If no exact match, try matching with 'men-' or 'kids-' prefix
   if (!product && !idStr.startsWith('men-') && !idStr.startsWith('kids-')) {
-    product = allProducts.find(p => p.id === `men-${idStr}` || p.id === `kids-${idStr}`);
+    product = allProducts.find(p => p.id === `men-${idStr}` || p.id === `women-${idStr}` || p.id === `kids-${idStr}`);
   }
-  
+
   return product;
 }
 
@@ -62,14 +115,14 @@ async function getFacilityData(id: string | undefined) {
 export default async function FacilityPage({ params }: FacilityPageProps) {
   const getParams = await params;
   const id = getParams.id.toLowerCase();
-  
+
   // Check if the ID is a category (men, women, kids)
   // const isCategory = ['men', 'women', 'kids'].includes(id);
-  
+
   // if (isCategory) {
   //   // Show category products
   //   const categoryProducts = shopData[id as keyof typeof shopData] || [];
-    
+
   //   return (
   //     <div className="container mx-auto px-4 py-8">
   //       {/* <div className="mb-6 pt-5">
@@ -108,7 +161,7 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
 
   return (
     <div className="container">
-      <div className="mb-5 pt-5">
+      <div className="mb-3 pt-3 lg:mb-5 lg:pt-5">
         <Button asChild variant="ghost" className="gap-2 cursor-pointer px-0! hover:bg-transparent!">
           <Link href="/">
             <ArrowLeft size={16} />
@@ -116,8 +169,8 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
           </Link>
         </Button>
       </div>
-      
-      <div className="grid md:grid-cols-2 gap-8 pb-5">
+
+      <div className="grid md:grid-cols-2 gap-6 lg:gap-8 pb-5">
         <div className="overflow-hidden">
           <Image
             src={facility.image}
@@ -152,11 +205,11 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
               <p className="text-gray-600">{facility.description}</p>
             </div>
 
-            {facility.sizes?.length > 0 && (
+            {(facility.sizes?.length ?? 0) > 0 && (
               <div>
                 <h3 className="font-medium text-gray-900 mb-2">Available Sizes</h3>
                 <div className="flex flex-wrap gap-2">
-                  {facility.sizes.map((size) => (
+                  {facility.sizes?.map((size) => (
                     <span key={size} className="px-3 py-1 border rounded-md text-sm">
                       {size}
                     </span>
@@ -165,12 +218,12 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
               </div>
             )}
 
-            {facility.colors?.length > 0 && (
+            {(facility.colors?.length ?? 0) > 0 && (
               <div>
                 <h3 className="font-medium text-gray-900 mb-2">Colors</h3>
                 <div className="flex flex-wrap gap-2">
-                  {facility.colors.map((color) => (
-                    <span 
+                  {facility.colors?.map((color) => (
+                    <span
                       key={color}
                       className="w-8 h-8 rounded-full border"
                       style={{ backgroundColor: color }}
@@ -217,9 +270,7 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
           </div>
 
           <div className="pt-4">
-            <Button size="lg" className="w-full cursor-pointer" disabled={!facility.inStock}>
-              {facility.inStock ? 'Add to Cart' : 'Out of Stock'}
-            </Button>
+            <AddToCartButton product={facility} />
           </div>
         </div>
       </div>
@@ -230,8 +281,8 @@ export default async function FacilityPage({ params }: FacilityPageProps) {
 // Generate static params for better performance
 export async function generateStaticParams() {
   // In a real app, you might fetch this from an API
-  const allProducts = [...shopData.men, ...shopData.kids];
-  
+  const allProducts = [...shopData.men, ...shopData.women, ...shopData.kids];
+
   return allProducts.map((product) => ({
     id: product.id,
   }));
