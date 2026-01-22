@@ -92,7 +92,7 @@ const MegaMenu = ({ submenu, isOpen, categoryName }: { submenu: NavItem['submenu
 };
 
 export default function Header() {
-    const { user, login, logout, savedItems, admin, logoutAdmin } = useAuth();
+    const { user, logout, savedItems, admin, logoutAdmin } = useAuth();
     const { cartCount, clearCart } = useCart();
     const router = useRouter();
     const pathname = usePathname();

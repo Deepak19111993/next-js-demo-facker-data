@@ -74,6 +74,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setSession(currentSession);
 
             if (currentSession?.user) {
+                if (!supabase) return;
                 // Fetch profile
                 const { data: profile, error } = await supabase
                     .from('profiles')
