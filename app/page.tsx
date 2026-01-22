@@ -1,5 +1,5 @@
 
-import { HeroSection } from "./components/landing/HeroSection";
+import { HomeBanner } from "./components/home/HomeBanner";
 import { TestimonialSection } from "./components/landing/TestimonialSection";
 import { AboutSection } from "./components/landing/AboutSection";
 import { OfferSection } from "./components/landing/OfferSection";
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export default function Page() {
   return (
     <div className="flex flex-col min-h-screen">
-      <HeroSection />
+      <HomeBanner />
       <AboutSection />
       <TestimonialSection />
       <PerfumeParallaxSection />

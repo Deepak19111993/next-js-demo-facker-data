@@ -44,6 +44,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         />
         <button
           onClick={handleLike}
+          data-no-view-cursor="true"
           className="absolute top-3 right-3 p-2 rounded-full bg-white/90 shadow-sm hover:bg-white hover:scale-110 transition-all z-10 cursor-pointer"
         >
           <Heart
@@ -70,6 +71,7 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
               }
             }}
             disabled={isInCart}
+            data-no-view-cursor="true"
             className={`w-full flex items-center justify-center gap-2 py-2 md:py-2.5 px-4 rounded-full transition-all duration-300 ${isInCart
               ? 'bg-white/20 backdrop-blur-md text-white/80 cursor-not-allowed'
               : 'bg-white text-black hover:bg-blue-600 hover:text-white shadow-lg cursor-pointer transform hover:scale-102 active:scale-95'}`}
@@ -96,6 +98,6 @@ export function ProductCard({ product, index = 0 }: { product: Product; index?: 
         </div>
         <p className="text-sm font-bold text-blue-600">${product.price.toFixed(2)}</p>
       </div>
-    </Link>
+    </Link >
   );
 }

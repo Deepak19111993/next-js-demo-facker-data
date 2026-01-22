@@ -42,6 +42,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
                     : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-blue-500/25 active:scale-95'
                 }`}
             onClick={handleAddToCart}
+            data-no-view-cursor="true"
             disabled={!product.inStock || isInCart}
         >
             <div className="flex items-center justify-center gap-2">

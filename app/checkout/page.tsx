@@ -161,7 +161,7 @@ export default function CheckoutPage() {
                                     Shipping Information
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2">
+                                    <div className="flex flex-col space-y-2">
                                         <label className="text-sm font-medium text-gray-700">Full Name <span className="text-red-500">*</span></label>
                                         <input
                                             type="text"
@@ -173,7 +173,7 @@ export default function CheckoutPage() {
                                             readOnly
                                         />
                                     </div>
-                                    <div className="space-y-2">
+                                    <div className="flex flex-col space-y-2">
                                         <label className="text-sm font-medium text-gray-700">Email Address <span className="text-red-500">*</span></label>
                                         <input
                                             type="email"
@@ -185,7 +185,7 @@ export default function CheckoutPage() {
                                             readOnly
                                         />
                                     </div>
-                                    <div className="md:col-span-2 space-y-2">
+                                    <div className="flex flex-col md:col-span-2 space-y-2">
                                         <label className="text-sm font-medium text-gray-700">Street Address <span className="text-red-500">*</span></label>
                                         <input
                                             type="text"

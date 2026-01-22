@@ -130,6 +130,7 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    cursor: none !important;
   }
 
   body {
@@ -188,4 +189,48 @@
 
 .animate-scroll:hover {
   animation-play-state: paused;
+}
+
+@keyframes draw-path {
+  0% {
+    stroke-dashoffset: 100;
+  }
+
+  50% {
+    stroke-dashoffset: 0;
+  }
+
+  100% {
+    stroke-dashoffset: 100;
+  }
+}
+
+.animate-draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: draw-path 3s ease-in-out infinite;
+}
+
+@keyframes text-shimmer {
+
+  0%,
+  100% {
+    background-position: -200% center;
+  }
+
+  50% {
+    background-position: 200% center;
+  }
+}
+
+.animate-text-shimmer {
+  background: linear-gradient(90deg,
+      #111827 0%,
+      #2563EB 50%,
+      #111827 100%);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: text-shimmer 3s linear infinite;
 }

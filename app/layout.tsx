@@ -6,6 +6,7 @@ import { Suspense } from "react";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { Toaster } from "@/components/ui/sonner"
+import { CustomCursor } from "./components/ui/CustomCursor";
 // import Footer from "./components/Footer";
 
 const geistSans = Geist({
@@ -36,6 +37,7 @@ export default function RootLayout({
         <Suspense>
           <AuthProvider>
             <CartProvider>
+              <CustomCursor />
               <Header />
               {children}
               {/* <Footer /> */}

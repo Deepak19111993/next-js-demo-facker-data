@@ -10,6 +10,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
 import { Heart, X, Search, Package, LayoutDashboard, ShoppingCart } from "lucide-react";
 import { AnimatedCounter } from "@/components/ui/AnimatedCounter";
+import { Logo } from "@/components/ui/Logo";
 
 const MegaMenu = ({ submenu, isOpen, categoryName }: { submenu: NavItem['submenu'], isOpen: boolean, categoryName?: string }) => {
     if (!submenu || !isOpen) return null;
@@ -159,13 +160,17 @@ export default function Header() {
         };
     }, [activeMenu, isSearchOpen]);
     return (
-        <div className="bg-white border-b border-gray-200 sticky top-0 z-50 w-full" ref={menuRef}>
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-50 w-full" ref={menuRef} data-no-view-cursor="true">
             <div className="relative">
                 <div className="container mx-auto px-4">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex-shrink-0">
-                            <Link href="/" className="text-xl font-bold text-gray-900">
-                                Logo
+                            <Link href="/" className="flex items-center gap-2">
+                                <span className="sr-only">Home</span>
+                                <div className="h-10 w-10 relative">
+                                    <Logo className="w-full h-full" />
+                                </div>
+                                <span className="text-xl font-bold animate-text-shimmer">Store</span>
                             </Link>
                         </div>
 
